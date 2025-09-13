@@ -219,7 +219,9 @@ export const POST: RequestHandler = async ({ request }) => {
 		});
 	} catch (err: any) {
 		console.error('Gemini error', { name: err?.name, status: err?.status, message: err?.message });
-		return new Response('Upstream error', { status: 502 });
+		const status = typeof err?.status === 'number' && err.status >= 400 && err.status <= 599 ? err.status : 502;
+		const msg = status === 401 || status === 403 ? 'Unauthorized' : 'Upstream error';
+		return new Response(msg, { status });
 	}
 };
 

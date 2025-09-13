@@ -2,7 +2,7 @@
   import type { Suggestion } from '../model/suggestion';
   import SuggestionItem from './SuggestionItem.svelte';
 
-  let { suggestions, selectedId, onSelect, onApply, onUndo, onApplyAll, loading = false }: {
+  let { suggestions, selectedId, onSelect, onApply, onUndo, onApplyAll, loading = false, errorMessage = null }: {
     suggestions: Suggestion[];
     selectedId: string | null;
     onSelect: (id: string) => void;
@@ -10,6 +10,7 @@
     onUndo: (s: Suggestion) => void;
     onApplyAll: () => void;
     loading?: boolean;
+    errorMessage?: string | null;
   } = $props();
   const corrections = $derived(suggestions.filter((s) => s.category !== 'style'));
   const style = $derived(suggestions.filter((s) => s.category === 'style'));
@@ -22,6 +23,11 @@
     <h3>Suggestions</h3>
     <div class="muted">{suggestions.length} total</div>
   </header>
+  {#if errorMessage}
+    <div class="alert">
+      {errorMessage}
+    </div>
+  {/if}
   <div class="actions">
     <button class="btn ghost" onclick={onApplyAll} disabled={loading || corrections.length === 0 || allAppliedCorrections}>Apply all corrections</button>
   </div>
@@ -75,6 +81,7 @@
 </section>
 <style>
   .panel { display:flex; flex-direction: column; height: 100%; }
+  .alert { margin: 0 .75rem .5rem .75rem; padding: .5rem .6rem; border: 1px solid color-mix(in oklab, red 30%, var(--border) 70%); background: color-mix(in oklab, red 8%, white 92%); color: oklch(0.5 0.22 28); border-radius: var(--radius); font-weight: 600; }
   header { display:flex; align-items: baseline; justify-content: space-between; padding: .75rem .75rem .25rem .75rem; }
   h3 { margin: 0; font-weight: 700; letter-spacing: .01em; }
   .actions { padding: 0 .75rem .5rem .75rem; }

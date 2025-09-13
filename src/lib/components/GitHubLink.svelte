@@ -1,5 +1,5 @@
 <script lang="ts">
-  let { href = 'https://github.com/sethmorton', title = 'GitHub: sethmorton' } = $props();
+  let { href = 'https://github.com/sethmorton/squiggle', title = 'GitHub: sethmorton' } = $props();
 </script>
 
 <a

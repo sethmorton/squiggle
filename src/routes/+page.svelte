@@ -10,6 +10,7 @@
   let apiKey = $state('');
   let suggestions = $state<Suggestion[]>([]);
   let selectedId = $state<string | null>(null);
+  let errorMsg = $state<string | null>(null);
   let editor: { highlightRange?: (start: number, end: number) => void } | null = null;
   let highlight = $state<{ start: number; end: number } | null>(null);
   let lastAnalyzedText = '';
@@ -42,6 +43,7 @@
   async function analyze() {
     loading = true;
     try {
+      errorMsg = null;
       let text = '';
       const unsub = textStore.subscribe((t) => (text = t));
       unsub();
@@ -69,8 +71,15 @@
             });
             const span = sentenceSpan(snap, editStart, editEndNew);
             if (span) {
-              const aiScoped = await fetchAiSuggestionsScoped(snap, apiKey, span.start, span.end);
-              suggestionsStore.update((arr) => merge(arr, aiScoped));
+              try {
+                const aiScoped = await fetchAiSuggestionsScoped(snap, apiKey, span.start, span.end);
+                suggestionsStore.update((arr) => merge(arr, aiScoped));
+              } catch (err: any) {
+                if (err?.name !== 'AbortError') {
+                  console.error(err);
+                  errorMsg = 'Could not fetch suggestions. Check your API key and try again.';
+                }
+              }
             }
           } else {
             const ai = await fetchAiSuggestions(snap, apiKey);
@@ -80,7 +89,10 @@
           }
           lastAnalyzedText = text;
         } catch (err: any) {
-          if (err?.name !== 'AbortError') console.error(err);
+          if (err?.name !== 'AbortError') {
+            console.error(err);
+            errorMsg = 'Could not fetch suggestions. Check your API key and try again.';
+          }
         }
       }
       selectedSuggestionId.set(null);
@@ -145,8 +157,15 @@
       const latest = updated;
       const span = sentenceSpan(latest, s.range.start, s.range.end);
       if (apiKey && span) {
-        const ai = await fetchAiSuggestionsScoped(latest, apiKey, span.start, span.end);
-        suggestionsStore.update((arr) => merge(arr, ai));
+        try {
+          const ai = await fetchAiSuggestionsScoped(latest, apiKey, span.start, span.end);
+          suggestionsStore.update((arr) => merge(arr, ai));
+        } catch (err: any) {
+          if (err?.name !== 'AbortError') {
+            console.error(err);
+            errorMsg = 'Could not refresh suggestions for this sentence. Check your API key.';
+          }
+        }
       }
     } catch (err: any) { if (err?.name !== 'AbortError') console.error(err); }
     finally { suppressAnalyze = false; }
@@ -176,8 +195,15 @@
       const latest = updated;
       const span = sentenceSpan(latest, s.range.start, s.range.end);
       if (apiKey && span) {
-        const ai = await fetchAiSuggestionsScoped(latest, apiKey, span.start, span.end);
-        suggestionsStore.update((arr) => merge(arr, ai));
+        try {
+          const ai = await fetchAiSuggestionsScoped(latest, apiKey, span.start, span.end);
+          suggestionsStore.update((arr) => merge(arr, ai));
+        } catch (err: any) {
+          if (err?.name !== 'AbortError') {
+            console.error(err);
+            errorMsg = 'Could not refresh suggestions for this sentence. Check your API key.';
+          }
+        }
       }
     } catch (err: any) { if (err?.name !== 'AbortError') console.error(err); }
     finally {
@@ -203,8 +229,15 @@
         const last = list[list.length - 1];
         const span = sentenceSpan(current, last.range.start, last.range.end);
         if (span) {
-          const ai = await fetchAiSuggestionsScoped(current, apiKey, span.start, span.end);
-          suggestionsStore.update((arr) => merge(arr, ai));
+          try {
+            const ai = await fetchAiSuggestionsScoped(current, apiKey, span.start, span.end);
+            suggestionsStore.update((arr) => merge(arr, ai));
+          } catch (err: any) {
+            if (err?.name !== 'AbortError') {
+              console.error(err);
+              errorMsg = 'Could not refresh suggestions after apply all. Check your API key.';
+            }
+          }
         }
       }
     } catch (err: any) { if (err?.name !== 'AbortError') console.error(err); }
@@ -247,6 +280,7 @@
         {selectedId}
         {suggestions}
         {loading}
+        errorMessage={errorMsg}
       />
     </aside>
   </main>
