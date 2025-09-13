@@ -1,8 +1,8 @@
-# Squiggle
+# Squiggle ➰
 
-API‑key‑based, Grammarly‑style suggestions for prose and Markdown.
+A tiny, friendly, Grammarly‑style checker you can run yourself. Bring your own Google AI key, keep your text yours, and get fast, minimal suggestions for prose and Markdown.
 
-This is a small, for‑fun clone that combines deterministic local rules with optional AI‑backed checks (Google Gemini). It focuses on minimal, correct edits and avoids code blocks, HTML, tables, and link targets.
+Squiggle mixes deterministic local rules with optional AI (Gemini) to propose small, safe fixes. It deliberately avoids code blocks, tables, raw HTML, and link targets.
 
 ## Features
 
@@ -11,6 +11,12 @@ This is a small, for‑fun clone that combines deterministic local rules with op
 - AI suggestions (optional): sentence-aware, prose-only, with conservative filtering.
 - Markdown-aware: protects fenced/inline code, HTML, tables, and URLs.
 - Scoped re-analysis after edits for snappy feedback.
+
+## Why
+
+- I didn’t want another subscription just for grammar nits.
+- Using my own API key is cheaper and gives me control.
+- Minimal UI, minimal edits — keep your voice, fix the bumps.
 
 ## Quick Start
 
@@ -21,7 +27,7 @@ pnpm install
 pnpm dev
 ```
 
-Open the app, paste a Google AI Studio API key in the UI, and start typing or paste text. The key is sent only with the current request and is not stored server-side. By default it is kept in-memory; you can optionally choose “Remember on this device” to persist it to localStorage.
+Open the app, paste a Google AI Studio API key, and start typing. The key is used only for the current request and isn’t stored server‑side. By default it stays in memory; you can optionally “Remember on this device” to save it in your browser.
 
 ## Configuration
 
@@ -46,6 +52,13 @@ The repo contains Drizzle + Postgres scaffolding, but the core grammar feature d
 - Local rules run first; AI suggestions are added, reconciled, and deduplicated.
 - Results are sorted by severity and confidence and presented in the UI.
 
+## What It Fixes
+
+- Spacing and punctuation basics (double spaces, missing spaces, repeated punctuation)
+- Common misspellings and duplicated words
+- Sentence starts and light case fixes
+- Optional style nips and tucks — only when they’re truly minimal and helpful
+
 ## Contributing / Maintenance
 
 Maintainer bandwidth is currently limited. If you’re interested in improving Squiggle:
@@ -62,7 +75,7 @@ MIT. Use the code however you like. This project is unaffiliated with Grammarly.
 
 ## Deploying
 
-This is a SvelteKit app with Vercel adapter included. For other targets, install the appropriate adapter. Security headers (CSP, XFO, etc.) are set in `src/hooks.server.ts`.
+This is a SvelteKit app with Vercel adapter included. For other targets, install the appropriate adapter. CSP is configured via `kit.csp` in `svelte.config.js`; additional security headers (XFO, XCTO, etc.) are set in `src/hooks.server.ts`.
 
 ```sh
 pnpm build
