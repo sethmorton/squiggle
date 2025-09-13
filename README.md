@@ -76,6 +76,12 @@ MIT. Use the code however you like. This project is unaffiliated with Grammarly.
 
 SvelteKit app with Vercel adapter. CSP is in `svelte.config.js` (`kit.csp`). Other headers live in `src/hooks.server.ts`.
 
+### Vercel Analytics (optional)
+
+- Enable Web Analytics and Speed Insights for the project in Vercel → Project → Settings → Analytics.
+- Code is already wired: in production, Squiggle injects `@vercel/analytics` and `@vercel/speed-insights` from `src/routes/+layout.svelte`.
+- No config needed for dev; data is collected only in production.
+
 ```sh
 pnpm build
 pnpm preview

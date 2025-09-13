@@ -1,8 +1,17 @@
 <script lang="ts">
   import '../app.css';
   import GitHubLink from '$lib/components/GitHubLink.svelte';
+  import { injectAnalytics } from '@vercel/analytics/sveltekit';
+  import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
+  import { dev } from '$app/environment';
 
-	let { children } = $props();
+let { children } = $props();
+
+// Add Vercel Analytics + Speed Insights in production
+if (!dev) {
+  injectAnalytics({ mode: 'production' });
+  injectSpeedInsights();
+}
 </script>
 
 <!-- Favicon is defined in app.html using %sveltekit.assets%/favicon.svg -->
